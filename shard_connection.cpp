@@ -260,6 +260,7 @@ int shard_connection::connect(struct connect_info* addr) {
     m_authentication = m_config->authenticate ? setup_none : setup_done;
     m_db_selection = m_config->select_db ? setup_none : setup_done;
     m_hello = (m_config->protocol == PROTOCOL_RESP2 || m_config->protocol == PROTOCOL_RESP3) ? setup_none : setup_done;
+    m_readonly = setup_none;
 
     // setup socket
     int sockfd = setup_socket(addr);
