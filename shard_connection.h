@@ -176,6 +176,7 @@ private:
     enum setup_state m_authentication;
     enum setup_state m_db_selection;
     enum setup_state m_cluster_slots;
+    enum setup_state m_readonly;
 };
 
 #endif //MEMTIER_BENCHMARK_SHARD_CONNECTION_H
