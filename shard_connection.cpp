@@ -519,7 +519,7 @@ void shard_connection::fill_pipeline(void)
     struct timeval now;
     gettimeofday(&now, NULL);
 
-    while (!m_conns_manager->finished() && m_pipeline->size() < m_config->pipeline && !m_conns_manager->replica_finished()) {
+    while (!m_conns_manager->finished() && m_pipeline->size() < m_config->pipeline && !m_conns_manager->replica_finished(m_id)) {
         if (!is_conn_setup_done()) {
             send_conn_setup_commands(now);
             return;
@@ -544,7 +544,7 @@ void shard_connection::fill_pipeline(void)
     if (m_bev != NULL) {
         // no pending response (nothing to read) and output buffer empty (nothing to write)
         if ((m_pending_resp == 0) && (evbuffer_get_length(bufferevent_get_output(m_bev)) == 0)) {
-            if (!replica || m_conns_manager->all_masters_closed) {
+            if (!replica || m_conns_manager->all_masters_closed()) {
                 benchmark_debug_log("%s Done, no requests to send no response to wait for\n", get_readable_id());
                 bufferevent_disable(m_bev, EV_WRITE|EV_READ);
                 if (m_config->request_rate) {
