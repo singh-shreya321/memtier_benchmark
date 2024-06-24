@@ -520,7 +520,6 @@ void shard_connection::fill_pipeline(void)
     gettimeofday(&now, NULL);
 
     while (!m_conns_manager->finished() && m_pipeline->size() < m_config->pipeline && !m_conns_manager->replica_finished(m_id)) {
-        benchmark_debug_log("ahaha]n");
         if (!is_conn_setup_done()) {
             send_conn_setup_commands(now);
             return;
@@ -540,7 +539,6 @@ void shard_connection::fill_pipeline(void)
         // client manage requests logic
         m_conns_manager->create_request(now, m_id);
     }
-
     // update events
     if (m_bev != NULL) {
         // no pending response (nothing to read) and output buffer empty (nothing to write)
@@ -548,6 +546,9 @@ void shard_connection::fill_pipeline(void)
             if (!replica || m_conns_manager->all_masters_closed()) {
                 benchmark_debug_log("%s Done, no requests to send no response to wait for\n", get_readable_id());
                 bufferevent_disable(m_bev, EV_WRITE|EV_READ);
+                if (!replica) {
+                    m_conns_manager->close_master();
+                }
                 if (m_config->request_rate) {
                     event_del(m_event_timer);
                 }
