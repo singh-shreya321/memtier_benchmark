@@ -570,7 +570,9 @@ void shard_connection::close_event() {
             if (m_config->request_rate) {
                 event_del(m_event_timer);
             }
+            return;
         }
+        benchmark_debug_log("%s not closing, %d \n", get_readable_id(), m_pending_resp);
     }
 }
 
