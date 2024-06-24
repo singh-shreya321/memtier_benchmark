@@ -226,9 +226,9 @@ void client::set_end_time() {
     // update only once
     if (!m_end_set) {
         benchmark_debug_log("nothing else to do, test is finished.\n");
-        for (int i = 0; i < m_connections.size(); i++) {
-            m_connections[i]->close_event();
-        }
+        // for (int i = 0; i < m_connections.size(); i++) {
+        //     m_connections[i]->close_event();
+        // }
         m_stats.set_end_time(NULL);
         m_end_set = true;
     }

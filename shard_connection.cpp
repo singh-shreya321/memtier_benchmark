@@ -553,8 +553,11 @@ void shard_connection::fill_pipeline(void)
                 if (!replica) {
                     m_conns_manager->close_master();
                 }
-                if (m_config->request_rate || replica) {
-                    event_del(m_event_timer);
+                if (m_config->request_rate || replica)  {
+                    if (m_event_timer != NULL) {
+                        event_del(m_event_timer);
+                        m_event_timer = NULL;
+                    }
                 }
                 return;
             }
@@ -562,8 +565,9 @@ void shard_connection::fill_pipeline(void)
             m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
             event_add(m_event_timer, &interval);
         }
-        if (replica) {
+        if (replica && m_event_timer != NULL) {
             event_del(m_event_timer);
+            m_event_timer = NULL;
         }
     }
 }
