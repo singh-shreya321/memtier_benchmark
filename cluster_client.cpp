@@ -275,7 +275,7 @@ void cluster_client::handle_cluster_slots(protocol_response *r) {
             if (sc == NULL) {
                 sc = create_shard_connection(MAIN_CONNECTION->get_protocol());
                 if (k > 2) {
-                    sc->set_replica();
+                    // sc->set_replica();
                     benchmark_debug_log("m_id: %d, size: %d\n", sc->get_id(), m_conn_replica.size());
                     m_conn_replica[sc->get_id()] = true;
                 }
