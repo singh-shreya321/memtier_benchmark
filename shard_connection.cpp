@@ -544,6 +544,7 @@ void shard_connection::fill_pipeline(void)
     }
     // update events
     if (m_bev != NULL) {
+
         // no pending response (nothing to read) and output buffer empty (nothing to write)
         if ((m_pending_resp == 0) && (evbuffer_get_length(bufferevent_get_output(m_bev)) == 0)) {
             if (!replica || m_conns_manager->all_masters_closed()) {
@@ -560,6 +561,9 @@ void shard_connection::fill_pipeline(void)
             struct timeval interval = {0 , 1000};
             m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
             event_add(m_event_timer, &interval);
+        }
+        if (replica) {
+            event_del(m_event_timer);
         }
     }
 }
