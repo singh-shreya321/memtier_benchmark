@@ -1335,6 +1335,8 @@ static void cleanup_openssl(void)
 
 int main(int argc, char *argv[])
 {
+    srand(time(0));
+    
     benchmark_config cfg = benchmark_config();
     cfg.arbitrary_commands = new arbitrary_command_list();
 

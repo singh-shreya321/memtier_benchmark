@@ -30,7 +30,7 @@ class shard_connection;
 class cluster_client : public client {
 protected:
     std::vector<key_index_pool*> m_key_index_pools;
-    unsigned int m_slot_to_shard[16384];
+    std::vector<int> m_slot_to_shard[16384];
 
     virtual int connect(void);
     virtual void disconnect(void);

@@ -233,53 +233,55 @@ void cluster_client::handle_cluster_slots(protocol_response *r) {
         int min_slot = strtol(shard->mbulks_elements[0]->as_bulk()->value + 1, NULL, 10);
         int max_slot = strtol(shard->mbulks_elements[1]->as_bulk()->value + 1, NULL, 10);
 
-        // hostname/ip
-        bulk_el* mbulk_addr_el = shard->mbulks_elements[2]->as_mbulk_size()->mbulks_elements[0]->as_bulk();
-        char* addr = (char*) malloc(mbulk_addr_el->value_len + 1);
-        memcpy(addr, mbulk_addr_el->value, mbulk_addr_el->value_len);
-        addr[mbulk_addr_el->value_len] = '\0';
+        for (unsigned int k = 2; k < shard->mbulks_elements.size(); k++) {
+            // hostname/ip
+            bulk_el* mbulk_addr_el = shard->mbulks_elements[k]->as_mbulk_size()->mbulks_elements[0]->as_bulk();
+            char* addr = (char*) malloc(mbulk_addr_el->value_len + 1);
+            memcpy(addr, mbulk_addr_el->value, mbulk_addr_el->value_len);
+            addr[mbulk_addr_el->value_len] = '\0';
 
-        // port
-        bulk_el* mbulk_port_el = shard->mbulks_elements[2]->as_mbulk_size()->mbulks_elements[1]->as_bulk();
-        char* port = (char*) malloc(mbulk_port_el->value_len + 1);
-        memcpy(port, mbulk_port_el->value + 1, mbulk_port_el->value_len);
-        port[mbulk_port_el->value_len] = '\0';
+            // port
+            bulk_el* mbulk_port_el = shard->mbulks_elements[k]->as_mbulk_size()->mbulks_elements[1]->as_bulk();
+            char* port = (char*) malloc(mbulk_port_el->value_len + 1);
+            memcpy(port, mbulk_port_el->value + 1, mbulk_port_el->value_len);
+            port[mbulk_port_el->value_len] = '\0';
 
-        // check if connection already exist
-        shard_connection* sc = NULL;
-        unsigned int j;
+            // check if connection already exist
+            shard_connection* sc = NULL;
+            unsigned int j;
 
-        for (j = 0; j < m_connections.size(); j++) {
-            if (strcmp(addr, m_connections[j]->get_address()) == 0 &&
-                strcmp(port, m_connections[j]->get_port()) == 0) {
-                sc = m_connections[j];
+            for (j = 0; j < m_connections.size(); j++) {
+                if (strcmp(addr, m_connections[j]->get_address()) == 0 &&
+                    strcmp(port, m_connections[j]->get_port()) == 0) {
+                    sc = m_connections[j];
 
-                // mark not to close this connection
-                if (j < prev_connections_size)
-                    close_sc[j] = false;
+                    // mark not to close this connection
+                    if (j < prev_connections_size)
+                        close_sc[j] = false;
 
-                // if connection disconnected, try to reconnect
-                if (sc->get_connection_state() == conn_disconnected) {
-                    connect_shard_connection(sc, addr, port);
+                    // if connection disconnected, try to reconnect
+                    if (sc->get_connection_state() == conn_disconnected) {
+                        connect_shard_connection(sc, addr, port);
+                    }
+
+                    break;
                 }
-
-                break;
             }
-        }
 
-        // if connection doesn't exist, add it
-        if (sc == NULL) {
-            sc = create_shard_connection(MAIN_CONNECTION->get_protocol());
-            connect_shard_connection(sc, addr, port);
-        }
+            // if connection doesn't exist, add it
+            if (sc == NULL) {
+                sc = create_shard_connection(MAIN_CONNECTION->get_protocol());
+                connect_shard_connection(sc, addr, port);
+            }
 
-        // update range
-        for (int j = min_slot; j <= max_slot; j++) {
-            m_slot_to_shard[j] = sc->get_id();
-        }
+            // update range
+            for (int j = min_slot; j <= max_slot; j++) {
+                m_slot_to_shard[j].push_back(sc->get_id());
+            }
 
-        free(addr);
-        free(port);
+            free(addr);
+            free(port);
+        }
     }
 
     // check if some connections left with no slots, and need to be closed
@@ -323,8 +325,11 @@ get_key_response cluster_client::get_key_for_conn(unsigned int command_index, un
 
     unsigned int hslot = calc_hslot_crc16_cluster(m_obj_gen->get_key(), m_obj_gen->get_key_len());
 
+    unsigned int other_conn_id = m_slot_to_shard[hslot][rand() % m_slot_to_shard[hslot].size()];
+
     // check if the key match for this connection
-    if (m_slot_to_shard[hslot] == conn_id) {
+    if (other_conn_id == conn_id) {
+
         benchmark_debug_log("%s generated key=[%.*s] for itself\n",
                             m_connections[conn_id]->get_readable_id(),
                             m_obj_gen->get_key_len(), m_obj_gen->get_key());
@@ -332,7 +337,6 @@ get_key_response cluster_client::get_key_for_conn(unsigned int command_index, un
     }
 
     // handle key for other connection
-    unsigned int other_conn_id = m_slot_to_shard[hslot];
 
     // in case we generated key for connection that is disconnected, 'slot to shard' map may need to be updated
     if (m_connections[other_conn_id]->get_connection_state() == conn_disconnected) {
