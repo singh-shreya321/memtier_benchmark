@@ -520,6 +520,7 @@ void shard_connection::fill_pipeline(void)
     gettimeofday(&now, NULL);
 
     while (!m_conns_manager->finished() && m_pipeline->size() < m_config->pipeline && !m_conns_manager->replica_finished(m_id)) {
+        benchmark_debug_log("ahaha]n");
         if (!is_conn_setup_done()) {
             send_conn_setup_commands(now);
             return;
