@@ -561,7 +561,7 @@ void shard_connection::fill_pipeline(void)
             return;
         }
         m_readonly = setup_none;
-        send_conn_setup_commands();
+        send_conn_setup_commands(now);
     }
 }
 
