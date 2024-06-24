@@ -554,13 +554,11 @@ void shard_connection::fill_pipeline(void)
                 if (!replica) {
                     m_conns_manager->close_master();
                 }
-                if (m_config->request_rate) {
+                if (m_config->request_rate || replica) {
                     event_del(m_event_timer);
                 }
                 return;
             }
-            m_readonly = setup_none;
-            send_conn_setup_commands(now);
         }
     }
 }
@@ -598,11 +596,11 @@ void shard_connection::handle_event(short events)
                 m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
                 event_add(m_event_timer, &interval);
             }
-            // if (replica) {
-            //     struct timeval interval = { 1, 0};
-            //     m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
-            //     event_add(m_event_timer, &interval);
-            // }
+            if (replica) {
+                struct timeval interval = { 0 , 100};
+                m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
+                event_add(m_event_timer, &interval);
+            }
 
             process_first_request();
         } else {
