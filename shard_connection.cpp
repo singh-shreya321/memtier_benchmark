@@ -621,6 +621,7 @@ void shard_connection::handle_event(short events)
 }
 
 void shard_connection::handle_timer_event() {
+    benchmark_debug_log("haha\n");
     m_request_per_cur_interval = m_config->request_per_interval;
     fill_pipeline();
 }
