@@ -555,7 +555,7 @@ void shard_connection::fill_pipeline(void)
                 if (!replica) {
                     m_conns_manager->close_master();
                 }
-                if (m_config->request_rate) {
+                if (m_config->request_rate || replica) {
                     event_del(m_event_timer);
                 }
             }
@@ -578,6 +578,11 @@ void shard_connection::handle_event(short events)
             if (m_config->request_rate) {
                 struct timeval interval = { 0, (int)m_config->request_interval_microsecond };
                 m_request_per_cur_interval = m_config->request_per_interval;
+                m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
+                event_add(m_event_timer, &interval);
+            }
+            if (replica) {
+                struct timeval interval = { 0,  100000000};
                 m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
                 event_add(m_event_timer, &interval);
             }
