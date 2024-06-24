@@ -561,9 +561,10 @@ void shard_connection::fill_pipeline(void)
                 }
                 return;
             }
-            struct timeval interval = {0 , 1000};
+            struct timeval interval = {1 , 0};
             m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
             event_add(m_event_timer, &interval);
+            benchmark_debug_log("Adding timer\n");
             return;
         }
         if (replica && m_event_timer != NULL) {
