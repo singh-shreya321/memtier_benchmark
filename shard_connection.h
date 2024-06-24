@@ -108,6 +108,10 @@ public:
         m_cluster_slots = setup_none;
     }
 
+    void set_replica() {
+        replica = true;
+    }
+
     enum setup_state get_cluster_slots_state() {
         return m_cluster_slots;
     }
@@ -177,6 +181,7 @@ private:
     enum setup_state m_db_selection;
     enum setup_state m_cluster_slots;
     enum setup_state m_readonly;
+    bool replica;
 };
 
 #endif //MEMTIER_BENCHMARK_SHARD_CONNECTION_H
