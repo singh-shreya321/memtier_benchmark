@@ -539,7 +539,7 @@ void shard_connection::fill_pipeline(void)
 
         // client manage requests logic
         m_conns_manager->create_request(now, m_id);
-
+        benchmark_debug_log("hahaha\n");
         if (this->replica && m_conns_manager->replica_finished(m_id)) {
             break;
         }
