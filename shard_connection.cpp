@@ -519,7 +519,7 @@ void shard_connection::fill_pipeline(void)
     struct timeval now;
     gettimeofday(&now, NULL);
 
-    while (!m_conns_manager->finished() && m_pipeline->size() < m_config->pipeline && !m_conns_manager->replica_finished(m_id)) {
+    while (!m_conns_manager->finished() && m_pipeline->size() < m_config->pipeline) {
         if (!is_conn_setup_done()) {
             send_conn_setup_commands(now);
             return;
@@ -538,6 +538,11 @@ void shard_connection::fill_pipeline(void)
 
         // client manage requests logic
         m_conns_manager->create_request(now, m_id);
+
+        if (m_conns_manager->replica_finished(m_id)) {
+            benchmark_debug_log("%d: breaking\n", m_id);
+            break;
+        }
     }
     // update events
     if (m_bev != NULL) {
