@@ -541,7 +541,6 @@ void shard_connection::fill_pipeline(void)
         m_conns_manager->create_request(now, m_id);
         benchmark_debug_log("hahaha %s \n", this->get_readable_id());
         if (this->replica && m_conns_manager->replica_finished(m_id)) {
-            benchmark_debug_log("breaking for %s \n", this->get_readable_id());
             break;
         }
     }
@@ -559,7 +558,10 @@ void shard_connection::fill_pipeline(void)
                     event_del(m_event_timer);
                 }
             }
+            return;
         }
+        m_readonly = setup_none;
+        send_conn_setup_commands();
     }
 }
 
