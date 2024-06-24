@@ -177,6 +177,7 @@ public:
     virtual int select_db(int db);
     virtual int authenticate(const char *credentials);
     virtual int configure_protocol(enum PROTOCOL_TYPE type);
+    virtual int readonly();
     virtual int write_command_cluster_slots();
     virtual int write_command_set(const char *key, int key_len, const char *value, int value_len, int expiry, unsigned int offset);
     virtual int write_command_get(const char *key, int key_len, unsigned int offset);
@@ -288,6 +289,19 @@ int redis_protocol::write_command_cluster_slots()
                         "SLOTS\r\n",
                         28);
 
+    return size;
+}
+
+int redis_protocol::readonly()
+{
+    int size = 0;
+
+    size = evbuffer_add(m_write_buf, 
+                        "*1\r\n"
+                        "$8\r\n"
+                        "READONLY\r\n",
+                        18);
+    
     return size;
 }
 

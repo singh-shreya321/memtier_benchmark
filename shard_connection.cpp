@@ -386,6 +386,13 @@ void shard_connection::send_conn_setup_commands(struct timeval timestamp) {
         m_hello = setup_sent;
     }
 
+    if (m_readonly == setup_none) {
+        benchmark_debug_log("sending READONLY command.\n");
+        m_protocol->readonly();
+        push_req(new request(rt_readonly, 0, &timestamp, 0));
+        m_readonly = setup_sent;
+    }
+
     if (m_cluster_slots == setup_none) {
         benchmark_debug_log("sending cluster slots command.\n");
 
@@ -450,6 +457,15 @@ void shard_connection::process_response(void)
             } else {
                 m_hello = setup_done;
                 benchmark_debug_log("HELLO successful.\n");
+            }
+            break;
+        case rt_readonly:
+           if (strcmp(r->get_status(), "+OK") != 0) {
+                benchmark_error_log("readonly command failed.\n");
+                error = true;
+            } else {
+                benchmark_debug_log("readonly successful.\n");
+                m_readonly = setup_done;
             }
             break;
         default:
