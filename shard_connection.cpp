@@ -564,6 +564,7 @@ void shard_connection::fill_pipeline(void)
             struct timeval interval = {0 , 1000};
             m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
             event_add(m_event_timer, &interval);
+            return;
         }
         if (replica && m_event_timer != NULL) {
             event_del(m_event_timer);
