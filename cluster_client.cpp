@@ -271,6 +271,10 @@ void cluster_client::handle_cluster_slots(protocol_response *r) {
             // if connection doesn't exist, add it
             if (sc == NULL) {
                 sc = create_shard_connection(MAIN_CONNECTION->get_protocol());
+                if (k > 2) {
+                    sc->set_replica();
+                    m_conn_replica[sc->get_id()] = true;
+                }
                 connect_shard_connection(sc, addr, port);
             }
 
@@ -363,6 +367,21 @@ get_key_response cluster_client::get_key_for_conn(unsigned int command_index, un
     return available_for_other_conn;
 }
 
+bool cluster_client::replica_finished(int conn_id) {
+    if (m_key_index_pools[conn_id]->empty() && m_conn_replica[conn_id]) {
+        return true;
+    }
+    return false;
+}
+
+bool cluster_client::all_masters_closed() {
+    return masters_closed == 3;
+}
+
+void cluster_client::close_master() {
+    masters_closed++;
+}
+
 bool cluster_client::create_arbitrary_request(unsigned int command_index, struct timeval& timestamp, unsigned int conn_id) {
     /* In arbitrary request, where we send the command arg by arg, we need to check for a key command,
      * if the generated key belongs to this connection before starting to send it */
@@ -395,6 +414,9 @@ bool cluster_client::create_arbitrary_request(unsigned int command_index, struct
 void cluster_client::create_request(struct timeval timestamp, unsigned int conn_id) {
     /* If pool is empty continue with base class */
     if (m_key_index_pools[conn_id]->empty()) {
+        if (m_conn_replica[conn_id]) {
+            return;
+        }
         client::create_request(timestamp, conn_id);
         return;
     }

@@ -56,6 +56,7 @@ protected:
 
     std::vector<shard_connection*> m_connections;
 
+
     struct event_base* m_event_base;
     bool m_initialized;
     bool m_end_set;

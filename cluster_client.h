@@ -31,6 +31,8 @@ class cluster_client : public client {
 protected:
     std::vector<key_index_pool*> m_key_index_pools;
     std::vector<int> m_slot_to_shard[16384];
+    std::vector<bool> m_conn_replica;
+    int masters_closed = 0;
 
     virtual int connect(void);
     virtual void disconnect(void);
@@ -41,6 +43,7 @@ protected:
                       request *request, protocol_response *response);
     void handle_ask(unsigned int conn_id, struct timeval timestamp,
                     request *request, protocol_response *response);
+
 
 public:
     cluster_client(client_group* group);
@@ -55,6 +58,10 @@ public:
     virtual bool hold_pipeline(unsigned int conn_id);
     virtual void handle_response(unsigned int conn_id, struct timeval timestamp,
                                  request *request, protocol_response *response);
+    virtual bool replica_finished(int conn_id);
+    virtual bool all_masters_closed();
+    virtual void close_master();
+
 };
 
 

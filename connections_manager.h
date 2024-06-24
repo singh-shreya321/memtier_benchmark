@@ -39,6 +39,10 @@ public:
 
     virtual int connect(void) = 0;
     virtual void disconnect(void) = 0;
+    virtual bool replica_finished(int conn_id) = 0;
+    virtual bool all_masters_closed(void) = 0;
+    virtual void close_master(void) = 0;
+
 };
 
 
