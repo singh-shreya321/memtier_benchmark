@@ -516,7 +516,6 @@ void shard_connection::process_first_request() {
 
 void shard_connection::fill_pipeline(void)
 {
-    benchmark_debug_log("inside for %s\n", this->get_readable_id());
     struct timeval now;
     gettimeofday(&now, NULL);
 
@@ -539,7 +538,6 @@ void shard_connection::fill_pipeline(void)
 
         // client manage requests logic
         m_conns_manager->create_request(now, m_id);
-        benchmark_debug_log("hahaha %s \n", this->get_readable_id());
         if (this->replica && m_conns_manager->replica_finished(m_id)) {
             break;
         }
@@ -559,6 +557,9 @@ void shard_connection::fill_pipeline(void)
                 }
                 return;
             }
+            struct timeval interval = {0 , 1000};
+            m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
+            event_add(m_event_timer, &interval);
         }
     }
 }
@@ -574,7 +575,6 @@ void shard_connection::close_event() {
             }
             return;
         }
-        benchmark_debug_log("%s not closing, %d \n", get_readable_id(), m_pending_resp);
     }
 }
 
@@ -593,11 +593,6 @@ void shard_connection::handle_event(short events)
             if (m_config->request_rate) {
                 struct timeval interval = { 0, (int)m_config->request_interval_microsecond };
                 m_request_per_cur_interval = m_config->request_per_interval;
-                m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
-                event_add(m_event_timer, &interval);
-            }
-            if (replica) {
-                struct timeval interval = { 0 , 100};
                 m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
                 event_add(m_event_timer, &interval);
             }
