@@ -110,7 +110,7 @@ static uint32_t calc_hslot_crc16_cluster(const char *str, size_t length)
 
 cluster_client::cluster_client(client_group* group) : client(group)
 {
-    m_conn_replica[0] = false;
+    m_conn_replica.push_back(false);
 }
 
 cluster_client::~cluster_client() {
