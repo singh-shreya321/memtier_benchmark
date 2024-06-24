@@ -173,6 +173,9 @@ shard_connection* cluster_client::create_shard_connection(abstract_protocol* abs
     m_key_index_pools.push_back(key_idx_pool);
     assert(m_connections.size() == m_key_index_pools.size());
 
+    m_conn_replica.push_back(false);
+    assert(m_conn_replica.size() == m_connections.size());
+
     return sc;
 }
 
