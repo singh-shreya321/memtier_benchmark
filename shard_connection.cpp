@@ -561,6 +561,19 @@ void shard_connection::fill_pipeline(void)
     }
 }
 
+void shard_connection::close_event() {
+    if (m_bev != NULL) {
+        // no pending response (nothing to read) and output buffer empty (nothing to write)
+        if ((m_pending_resp == 0) && (evbuffer_get_length(bufferevent_get_output(m_bev)) == 0)) {
+            benchmark_debug_log("%s Done, no requests to send no response to wait for\n", get_readable_id());
+            bufferevent_disable(m_bev, EV_WRITE|EV_READ);
+            if (m_config->request_rate) {
+                event_del(m_event_timer);
+            }
+        }
+    }
+}
+
 void shard_connection::handle_event(short events)
 {
     // connect() returning to us?  normally we expect EV_WRITE, but for UNIX domain

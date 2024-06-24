@@ -112,6 +112,8 @@ public:
         replica = true;
     }
 
+    void close_event();
+
     enum setup_state get_cluster_slots_state() {
         return m_cluster_slots;
     }
