@@ -388,7 +388,7 @@ void shard_connection::send_conn_setup_commands(struct timeval timestamp) {
 
     if (m_readonly == setup_none) {
         benchmark_debug_log("sending READONLY command.\n");
-        m_protocol->readonly();
+        m_protocol->write_command_readonly();
         push_req(new request(rt_readonly, 0, &timestamp, 0));
         m_readonly = setup_sent;
     }
