@@ -378,6 +378,7 @@ bool cluster_client::replica_finished(int conn_id) {
 }
 
 bool cluster_client::all_masters_closed() {
+    benchmark_debug_log("val: %d\n", masters_closed);
     return masters_closed == 3;
 }
 
