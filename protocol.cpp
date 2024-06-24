@@ -778,6 +778,7 @@ public:
     virtual int authenticate(const char *credentials);
     virtual int configure_protocol(enum PROTOCOL_TYPE type);
     virtual int write_command_cluster_slots();
+    virtual int write_command_readonly();
     virtual int write_command_set(const char *key, int key_len, const char *value, int value_len, int expiry, unsigned int offset);
     virtual int write_command_get(const char *key, int key_len, unsigned int offset);
     virtual int write_command_multi_get(const keylist *keylist);
@@ -807,6 +808,10 @@ int memcache_text_protocol::configure_protocol(enum PROTOCOL_TYPE type)
 }
 
 int memcache_text_protocol::write_command_cluster_slots()
+{
+    assert(0);
+}
+int memcache_text_protocol::write_command_readonly()
 {
     assert(0);
 }
@@ -1000,6 +1005,7 @@ public:
     virtual int authenticate(const char *credentials);
     virtual int configure_protocol(enum PROTOCOL_TYPE type);
     virtual int write_command_cluster_slots();
+    virtual int write_command_readonly();
     virtual int write_command_set(const char *key, int key_len, const char *value, int value_len, int expiry, unsigned int offset);
     virtual int write_command_get(const char *key, int key_len, unsigned int offset);
     virtual int write_command_multi_get(const keylist *keylist);
@@ -1062,6 +1068,11 @@ int memcache_binary_protocol::write_command_cluster_slots()
 {
     assert(0);
 }
+int memcache_binary_protocol::write_command_readonly()
+{
+    assert(0);
+}
+
 
 int memcache_binary_protocol::write_command_set(const char *key, int key_len, const char *value, int value_len, int expiry, unsigned int offset)
 {
