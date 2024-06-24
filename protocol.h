@@ -186,6 +186,7 @@ public:
     virtual int authenticate(const char *credentials) = 0;
     virtual int configure_protocol(enum PROTOCOL_TYPE type) = 0;
     virtual int write_command_cluster_slots() = 0;
+    virtual int write_command_readonly() = 0;
     virtual int write_command_set(const char *key, int key_len, const char *value, int value_len, int expiry, unsigned int offset) = 0;
     virtual int write_command_get(const char *key, int key_len, unsigned int offset) = 0;
     virtual int write_command_multi_get(const keylist *keylist) = 0;
