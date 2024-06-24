@@ -115,6 +115,18 @@ public:
         assert(false && "handle_cluster_slots not supported");
     }
 
+    virtual bool all_masters_closed() {
+        assert(false && "all_masters_closed not supported");
+    }
+
+    virtual bool replica_finished(int conn_id) {
+        assert(false && "replica_finished not supported");
+    }
+
+    virtual void close_master() {
+        assert(false && "close_master not supported");
+    }
+
     virtual void handle_response(unsigned int conn_id, struct timeval timestamp,
                                  request *request, protocol_response *response);
     virtual bool finished(void);
