@@ -355,9 +355,6 @@ void shard_connection::push_req(request* req) {
 }
 
 bool shard_connection::is_conn_setup_done() {
-    benchmark_debug_log("authentication: %d\n", m_authentication);
-    benchmark_debug_log("cluster_slots: %d\n", m_cluster_slots);
-    benchmark_debug_log("readonly: %d\n", m_readonly);
     return m_authentication == setup_done &&
            m_db_selection == setup_done &&
            m_cluster_slots == setup_done &&
