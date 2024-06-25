@@ -547,7 +547,7 @@ void shard_connection::fill_pipeline(void)
 
         // no pending response (nothing to read) and output buffer empty (nothing to write)
         if ((m_pending_resp == 0) && (evbuffer_get_length(bufferevent_get_output(m_bev)) == 0)) {
-            if (!replica || m_conns_manager->all_masters_closed()) {
+            if (!replica || m_conns_manager->all_masters_closed() || m_conns_manager->finished()) {
                 benchmark_debug_log("%s Done, no requests to send no response to wait for\n", get_readable_id());
                 bufferevent_disable(m_bev, EV_WRITE|EV_READ);
                 if (!replica) {
@@ -562,10 +562,10 @@ void shard_connection::fill_pipeline(void)
                 return;
             }
             if (m_event_timer == NULL) {
-            struct timeval interval = {0, 1000};
-            m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
-            event_add(m_event_timer, &interval);
-            benchmark_debug_log("Adding timer\n");
+                struct timeval interval = {0, 1000};
+                m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
+                event_add(m_event_timer, &interval);
+                benchmark_debug_log("Adding timer\n");
             }
             return;
         }
