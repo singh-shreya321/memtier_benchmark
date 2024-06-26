@@ -585,8 +585,9 @@ void shard_connection::close_event() {
         if ((m_pending_resp == 0) && (evbuffer_get_length(bufferevent_get_output(m_bev)) == 0)) {
             benchmark_debug_log("%s Done, no requests to send no response to wait for\n", get_readable_id());
             bufferevent_disable(m_bev, EV_WRITE|EV_READ);
-            if (m_config->request_rate) {
+            if (m_config->request_rate && m_event_timer != NULL) {
                 event_del(m_event_timer);
+                m_event_timer=NULL;
             }
             return;
         }
@@ -610,6 +611,7 @@ void shard_connection::handle_event(short events)
                 m_request_per_cur_interval = m_config->request_per_interval;
                 m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
                 event_add(m_event_timer, &interval);
+                benchmark_debug_log("m_event_timer: %p\n", this->get_readable_id());
             }
 
             process_first_request();
@@ -617,7 +619,7 @@ void shard_connection::handle_event(short events)
             benchmark_debug_log("reconnection complete, proceeding with test\n");
             fill_pipeline();
         }
-
+        benchmark_debug_log("returning from %p\n", this->get_readable_id());
         return;
     }
 
