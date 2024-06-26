@@ -557,16 +557,17 @@ void shard_connection::fill_pipeline(void)
                 if (m_config->request_rate || replica)  {
                     if (m_event_timer != NULL) {
                         event_del(m_event_timer);
+                        m_event_timer = NULL;
+
                     }
                 }
-                m_event_timer = NULL;
                 return;
             }
             if (m_event_timer == NULL) {
                 struct timeval interval = {0, 1000};
                 m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
                 event_add(m_event_timer, &interval);
-                benchmark_debug_log("Adding timer for %s\n", this->get_readable_id());
+                benchmark_debug_log("Adding timer %p for %s\n", m_event_timer, this->get_readable_id());
             }
             return;
         }
