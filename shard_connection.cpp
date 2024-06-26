@@ -557,9 +557,9 @@ void shard_connection::fill_pipeline(void)
                 if (m_config->request_rate || replica)  {
                     if (m_event_timer != NULL) {
                         event_del(m_event_timer);
-                        m_event_timer = NULL;
                     }
                 }
+                m_event_timer = NULL;
                 return;
             }
             if (m_event_timer == NULL) {
