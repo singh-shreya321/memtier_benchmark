@@ -516,6 +516,7 @@ void shard_connection::process_first_request() {
 
 void shard_connection::fill_pipeline(void)
 {
+    benchmark_debug_log("inside: %s\n", this->get_readable_id());
     struct timeval now;
     gettimeofday(&now, NULL);
 
@@ -680,7 +681,6 @@ void shard_connection::send_get_command(struct timeval* sent_time,
     benchmark_debug_log("server %s: GET key=[%.*s]\n", get_readable_id(), key_len, key);
     cmd_size = m_protocol->write_command_get(key, key_len, offset);
     push_req(new request(rt_get, cmd_size, sent_time, 1));
-    benchmark_debug_log("successful push\n");
 }
 
 void shard_connection::send_mget_command(struct timeval* sent_time, const keylist* key_list) {
