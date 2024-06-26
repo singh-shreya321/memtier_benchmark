@@ -507,6 +507,7 @@ void shard_connection::process_response(void)
     if (m_conns_manager->finished()) {
         m_conns_manager->set_end_time();
     }
+    benchmark_debug_log("returning from %p\n", this->get_readable_id());
 }
 
 void shard_connection::process_first_request() {
