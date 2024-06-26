@@ -436,7 +436,6 @@ void cluster_client::create_request(struct timeval timestamp, unsigned int conn_
         create_get_request(timestamp, conn_id);
     else
         assert("Unexpected command index");
-    benchmark_debug_log("success\n");
     /* Make sure we used pair of command and key index */
     assert(m_key_index_pools[conn_id]->size() == pool_size - 2);
 }

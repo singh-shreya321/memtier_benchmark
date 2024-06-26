@@ -570,6 +570,7 @@ void shard_connection::fill_pipeline(void)
             }
             return;
         }
+        benchmark_debug_log("hhh: %p\n", m_event_timer);
         if (replica && m_event_timer != NULL) {
             event_del(m_event_timer);
             m_event_timer = NULL;
