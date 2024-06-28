@@ -559,6 +559,7 @@ void shard_connection::fill_pipeline(void)
                 if (m_config->request_rate || replica)  {
                     if (m_event_timer != NULL) {
                         event_del(m_event_timer);
+                        free(m_event_timer);
                         m_event_timer = NULL;
 
                     }
@@ -573,9 +574,10 @@ void shard_connection::fill_pipeline(void)
             }
             return;
         }
-        benchmark_debug_log("hhh: %p\n", m_event_timer);
         if (replica && m_event_timer != NULL) {
+            benchmark_debug_log("hhh: %p\n", m_event_timer);
             event_del(m_event_timer);
+            free(m_event_timer);
             m_event_timer = NULL;
         }
     }
@@ -591,6 +593,7 @@ void shard_connection::close_event() {
             bufferevent_disable(m_bev, EV_WRITE|EV_READ);
             if (m_config->request_rate && m_event_timer != NULL) {
                 event_del(m_event_timer);
+                free(m_event_timer);
                 m_event_timer=NULL;
             }
             return;
