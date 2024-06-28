@@ -509,12 +509,10 @@ void shard_connection::process_response(void)
     }
 
     fill_pipeline();
-    benchmark_debug_log("returned from fill_pipeline %s\n", this->get_readable_id());
 
     if (m_conns_manager->finished()) {
         m_conns_manager->set_end_time();
     }
-    benchmark_debug_log("returning from %s\n", this->get_readable_id());
 }
 
 void shard_connection::process_first_request() {
@@ -524,8 +522,6 @@ void shard_connection::process_first_request() {
 
 void shard_connection::fill_pipeline(void)
 {
-    benchmark_debug_log("inside: %s\n", this->get_readable_id());
-    benchmark_debug_log("event_Timer: %p\n", m_event_timer);
     struct timeval now;
     gettimeofday(&now, NULL);
 
@@ -567,7 +563,6 @@ void shard_connection::fill_pipeline(void)
                     if (event_timer_set == true) {
                         event_del(m_event_timer);
                         event_timer_set = false;
-                        benchmark_debug_log("event_timer %p deleted\n", m_event_timer);
                     }
                 }
                 return;
@@ -576,18 +571,14 @@ void shard_connection::fill_pipeline(void)
                 struct timeval interval = {0, 1000};
                 event_add(m_event_timer, &interval);
                 event_timer_set = true;
-                benchmark_debug_log("Adding timer %p for %s\n", m_event_timer, this->get_readable_id());
             }
             return;
         }
         if (replica && event_timer_set == true) {
-            benchmark_debug_log("hhh: %p, replica: %d\n", m_event_timer, this->replica);
             event_del(m_event_timer);
-            benchmark_debug_log("event_timer %p deleted\n", m_event_timer);
             event_timer_set = false;
         }
     }
-    benchmark_debug_log("returning from fill_pipeline %s\n", this->get_readable_id());
 
 }
 
@@ -631,7 +622,6 @@ void shard_connection::handle_event(short events)
             benchmark_debug_log("reconnection complete, proceeding with test\n");
             fill_pipeline();
         }
-        benchmark_debug_log("returning from %s\n", this->get_readable_id());
         return;
     }
 
