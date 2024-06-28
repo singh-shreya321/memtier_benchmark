@@ -580,7 +580,7 @@ void shard_connection::fill_pipeline(void)
             }
             return;
         }
-        if (replica && m_event_timer == true) {
+        if (replica && event_timer_set == true) {
             benchmark_debug_log("hhh: %p, replica: %d\n", m_event_timer, this->replica);
             event_del(m_event_timer);
             benchmark_debug_log("event_timer %p deleted\n", m_event_timer);
