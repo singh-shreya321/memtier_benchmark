@@ -503,7 +503,7 @@ void shard_connection::process_response(void)
     }
 
     fill_pipeline();
-            benchmark_debug_log("returned from fill_pipeline %p\n", this->get_readable_id());
+    benchmark_debug_log("returned from fill_pipeline %s\n", this->get_readable_id());
 
     if (m_conns_manager->finished()) {
         m_conns_manager->set_end_time();
@@ -579,7 +579,7 @@ void shard_connection::fill_pipeline(void)
             m_event_timer = NULL;
         }
     }
-    benchmark_debug_log("returning from fill_pipeline %p\n", this->get_readable_id());
+    benchmark_debug_log("returning from fill_pipeline %s\n", this->get_readable_id());
 
 }
 
