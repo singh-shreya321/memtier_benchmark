@@ -579,7 +579,7 @@ void shard_connection::fill_pipeline(void)
             m_event_timer = NULL;
         }
     }
-        benchmark_debug_log("returning from fill_pipeline %p\n", this->get_readable_id());
+    benchmark_debug_log("returning from fill_pipeline %p\n", this->get_readable_id());
 
 }
 
@@ -623,7 +623,7 @@ void shard_connection::handle_event(short events)
             benchmark_debug_log("reconnection complete, proceeding with test\n");
             fill_pipeline();
         }
-        benchmark_debug_log("returning from %p\n", this->get_readable_id());
+        benchmark_debug_log("returning from %s\n", this->get_readable_id());
         return;
     }
 
