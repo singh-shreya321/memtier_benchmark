@@ -184,6 +184,11 @@ shard_connection::~shard_connection() {
         m_pipeline = NULL;
     }
 
+    if (m_event_timer != NULL) {
+        event_free(m_event_timer);
+        m_event_timer = NULL;
+    }
+
 }
 
 void shard_connection::setup_event(int sockfd) {
@@ -307,6 +312,7 @@ void shard_connection::disconnect() {
     m_db_selection = setup_done;
     m_cluster_slots = setup_done;
     m_hello = setup_done;
+    event_timer_set = false;
 }
 
 void shard_connection::set_address_port(const char* address, const char* port) {
@@ -558,29 +564,27 @@ void shard_connection::fill_pipeline(void)
                     m_conns_manager->close_master();
                 }
                 if (m_config->request_rate || replica)  {
-                    if (m_event_timer != NULL) {
+                    if (event_timer_set == true) {
                         event_del(m_event_timer);
+                        event_timer_set = false;
                         benchmark_debug_log("event_timer %p deleted\n", m_event_timer);
-                        free(m_event_timer);
-                        m_event_timer = NULL;
                     }
                 }
                 return;
             }
-            if (m_event_timer == NULL) {
+            if (event_timer_set == false) {
                 struct timeval interval = {0, 1000};
-                m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
                 event_add(m_event_timer, &interval);
+                event_timer_set = true;
                 benchmark_debug_log("Adding timer %p for %s\n", m_event_timer, this->get_readable_id());
             }
             return;
         }
-        if (replica && m_event_timer != NULL) {
+        if (replica && m_event_timer == true) {
             benchmark_debug_log("hhh: %p, replica: %d\n", m_event_timer, this->replica);
             event_del(m_event_timer);
             benchmark_debug_log("event_timer %p deleted\n", m_event_timer);
-            free(m_event_timer);
-            m_event_timer = NULL;
+            event_timer_set = false;
         }
     }
     benchmark_debug_log("returning from fill_pipeline %s\n", this->get_readable_id());
@@ -612,15 +616,14 @@ void shard_connection::handle_event(short events)
     if ((get_connection_state() == conn_in_progress) && (events & BEV_EVENT_CONNECTED)) {
         m_connection_state = conn_connected;
         bufferevent_enable(m_bev, EV_READ|EV_WRITE);
-
+        m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
         if (!m_conns_manager->get_reqs_processed()) {
             /* Set timer for request rate */
             if (m_config->request_rate) {
                 struct timeval interval = { 0, (int)m_config->request_interval_microsecond };
                 m_request_per_cur_interval = m_config->request_per_interval;
-                m_event_timer = event_new(m_event_base, -1, EV_PERSIST, cluster_client_timer_handler, (void *)this);
                 event_add(m_event_timer, &interval);
-                benchmark_debug_log("m_event_timer: %p\n", this->get_readable_id());
+                event_timer_set = true;
             }
 
             process_first_request();

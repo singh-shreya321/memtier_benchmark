@@ -184,6 +184,7 @@ private:
     enum setup_state m_cluster_slots;
     enum setup_state m_readonly;
     bool replica;
+    bool event_timer_set = false;
 };
 
 #endif //MEMTIER_BENCHMARK_SHARD_CONNECTION_H
