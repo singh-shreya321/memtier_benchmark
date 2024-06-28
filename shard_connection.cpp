@@ -559,9 +559,9 @@ void shard_connection::fill_pipeline(void)
                 if (m_config->request_rate || replica)  {
                     if (m_event_timer != NULL) {
                         event_del(m_event_timer);
+                        benchmark_debug_log("event_timer %p deleted\n", m_event_timer);
                         free(m_event_timer);
                         m_event_timer = NULL;
-
                     }
                 }
                 return;
@@ -577,6 +577,7 @@ void shard_connection::fill_pipeline(void)
         if (replica && m_event_timer != NULL) {
             benchmark_debug_log("hhh: %p\n", m_event_timer);
             event_del(m_event_timer);
+            benchmark_debug_log("event_timer %p deleted\n", m_event_timer);
             free(m_event_timer);
             m_event_timer = NULL;
         }
