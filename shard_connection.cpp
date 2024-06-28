@@ -519,7 +519,7 @@ void shard_connection::process_first_request() {
 void shard_connection::fill_pipeline(void)
 {
     benchmark_debug_log("inside: %s\n", this->get_readable_id());
-    benchmark_debug_log("event_Timer: %p", m_event_timer);
+    benchmark_debug_log("event_Timer: %p\n", m_event_timer);
     struct timeval now;
     gettimeofday(&now, NULL);
 
