@@ -538,6 +538,7 @@ void shard_connection::fill_pipeline(void)
 
         // client manage requests logic
         m_conns_manager->create_request(now, m_id);
+        benchmark_debug_log("haha\n");
     }
 
     // update events
