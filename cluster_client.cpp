@@ -232,10 +232,6 @@ void cluster_client::handle_cluster_slots(protocol_response *r) {
 
         int min_slot = strtol(shard->mbulks_elements[0]->as_bulk()->value + 1, NULL, 10);
         int max_slot = strtol(shard->mbulks_elements[1]->as_bulk()->value + 1, NULL, 10);
-        if (min_slot != 10923) {
-            benchmark_debug_log("continue\n");
-            continue;
-        }
 
         for (unsigned int k = 2; k < shard->mbulks_elements.size(); k++) {
             // hostname/ip
