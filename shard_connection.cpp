@@ -516,6 +516,7 @@ void shard_connection::process_first_request() {
 
 void shard_connection::fill_pipeline(void)
 {
+    benchmark_debug_log("inside %s", this->get_readable_id());
     struct timeval now;
     gettimeofday(&now, NULL);
 
