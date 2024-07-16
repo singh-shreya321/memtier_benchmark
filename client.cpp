@@ -333,11 +333,11 @@ bool client::create_get_request(struct timeval& timestamp, unsigned int conn_id)
     get_key_response res = get_key_for_conn(GET_CMD_IDX, conn_id, &key_index);
     if (res == not_available)
         return false;
-    benchmark_debug_log()
+    benchmark_debug_log("haha\n");
     if (res == available_for_conn) {
         m_connections[conn_id]->send_get_command(&timestamp, m_obj_gen->get_key(), m_obj_gen->get_key_len(), m_config->data_offset);
     }
-
+    benchmark_debug_log("hahaaaa\n");
     return true;
 }
 
