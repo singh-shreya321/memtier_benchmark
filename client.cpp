@@ -334,6 +334,7 @@ bool client::create_get_request(struct timeval& timestamp, unsigned int conn_id)
     if (res == not_available)
         return false;
     benchmark_debug_log()
+    if (res == available_for_conn) {
         m_connections[conn_id]->send_get_command(&timestamp, m_obj_gen->get_key(), m_obj_gen->get_key_len(), m_config->data_offset);
     }
 
